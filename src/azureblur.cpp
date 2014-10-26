@@ -3,7 +3,7 @@
 using namespace mozilla::gfx;
 
 extern "C" {
-    int azureblur_new() {
+    int azureblur_new(void) {
         Rect rect;
         AlphaBoxBlur blur = AlphaBoxBlur(nullptr, rect, 1, 1);
         return 42;
