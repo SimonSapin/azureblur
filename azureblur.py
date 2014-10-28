@@ -7,7 +7,10 @@ def _init():
     src = os.path.join(root, 'src')
     moz2d = os.path.join(root, 'moz2d')
     with open(os.path.join(src, 'azureblur.h')) as fd:
-        declarations = fd.read()
+        declarations = '''
+            struct AlphaBoxBlur;  // Opaque
+            typedef struct AlphaBoxBlur AlphaBoxBlur;
+        ''' + fd.read()
     ffi = cffi.FFI()
     ffi.cdef(declarations)
     azureblur = ffi.verify(
@@ -24,4 +27,5 @@ def _init():
 ffi, azureblur = _init()
 
 
-print(azureblur.azureblur_new())
+result = azureblur.azureblur_calculate_blur_radius(200, 300)
+print(result.width, result.height)
