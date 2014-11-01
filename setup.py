@@ -7,6 +7,8 @@ setup(
     version='0.1',
     url='https://github.com/SimonSapin/azureblur',
     license='MPL2',
+    maintainer='Simon Sapin',
+    maintainer_email='simon.sapin@exyr.org',
     description='The triple box blur implementation from Firefox’s moz2d/Azure, with Python bindings.',
     long_description=io.open(
         os.path.join(os.path.dirname(__file__), 'README.rst'),
