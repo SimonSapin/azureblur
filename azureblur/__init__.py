@@ -1,4 +1,5 @@
 import os
+import array
 import cffi
 
 
@@ -77,7 +78,7 @@ class AlphaBoxBlur(object):
             A ``(x, y, width, height)`` tuple, or :obj:`None`.
 
         """
-        cls(azureblur_blur.azureblur_new_from_radiuses(
+        return cls(azureblur.azureblur_new_from_radiuses(
             ffi.new('struct azureblur_rect*', rect),
             ffi.new('struct azureblur_intsize*', spread_radius),
             ffi.new('struct azureblur_intsize*', blur_radius),
@@ -98,7 +99,7 @@ class AlphaBoxBlur(object):
         **TODO:** document other parameters.
 
         """
-        cls(azureblur_blur.azureblur_new_from_sigma(
+        return cls(azureblur.azureblur_new_from_sigma(
             ffi.new('struct azureblur_rect*', rect),
             stride, sigma_x, sigma_y))
 
@@ -115,7 +116,7 @@ class AlphaBoxBlur(object):
         Return the stride, in bytes, of the 8-bit alpha surface we'd use.
 
         """
-        return azureblur.azureblur_get_size(self._pointer)
+        return azureblur.azureblur_get_stride(self._pointer)
 
     def get_rect(self):
         """
@@ -139,7 +140,7 @@ class AlphaBoxBlur(object):
         return azureblur.azureblur_get_surface_allocation_size(self._pointer)
 
     def blur(self, data):
-        """
+        r"""
         Perform the blur in-place
         on the surface backed by specified 8-bit alpha surface data.
         The size must be at least
@@ -147,7 +148,18 @@ class AlphaBoxBlur(object):
         or bad things will happen.
 
         :param data:
-            A pointer as a CFFI :class:`CData` object.
+            A ``uint8_t*`` pointer as a CFFI :class:`CData` object.
+
+        Usage example:
+
+        .. code-block:: python
+
+            import azureblur
+            blur = azureblur.AlphaBoxBlur.from_radiuses(...)
+            alloc_size = blur.get_surface_allocation_size()
+            data = array.array('B', b'\x00' * alloc_size)
+            address, _ = data.buffer_info()
+            blur.blur(azureblur.ffi.cast('uint8_t*', address))
 
         """
         azureblur.azureblur_blur(self._pointer, data)
@@ -166,7 +178,64 @@ def calculate_blur_radius(standard_deviation_x, standard_deviation_y):
     return size.width, size.height
 
 
-def test():
-    width, height = calculate_blur_radius(1000, 2000)
-    assert width == 2820
-    assert height == 5640
+def test_calculate():
+    assert calculate_blur_radius(1000, 2000) == (2820, 5640)
+
+
+def test_parameters():
+    blur = AlphaBoxBlur.from_radiuses(
+        spread_radius=(1, 2),
+        blur_radius=(4, 8),
+        rect=(-16, 32, 64, 128),
+    )
+
+    # Size of rect, inflated by spread + blur radiuses
+    assert blur.get_size() == (74, 148)
+    assert blur.get_size() == (64 + 2 * (1 + 4), 128 + 2 * (2 + 8))
+
+    # Next multiple of 4 after width == 74
+    assert blur.get_stride() == 76
+    assert blur.get_stride() == (74 + 3) // 4 * 4
+
+    # rect inflated by spread + blur radiuses
+    assert blur.get_rect() == (-21, 22, 74, 148)
+    assert blur.get_rect() == (
+        -16 - (1 + 4),
+        32 - (2 + 8),
+        64 + 2 * (1 + 4),
+        128 + 2 * (2 + 8)
+    )
+    assert blur.get_rect()[2:] == blur.get_size()
+
+    # stride * height + (3 bytes for algorithm overflow)
+    assert blur.get_surface_allocation_size() == 11251
+    assert blur.get_surface_allocation_size() == 76 * 148 + 3
+
+
+def test_blur():
+    blur = AlphaBoxBlur.from_radiuses(
+        rect=(0, 0, 4, 1),
+        spread_radius=(0, 0),
+        blur_radius=(2, 2),
+    )
+    assert blur.get_size() == (8, 5)
+    assert blur.get_stride() == 8
+    alloc_size = blur.get_surface_allocation_size()
+    data = array.array('B', b'\x00' * alloc_size)
+    data[8 * 2 + 2] = 0xFF
+    data[8 * 2 + 3] = 0xFF
+    data[8 * 2 + 4] = 0xFF
+    data[8 * 2 + 5] = 0xFF
+    address, _ = data.buffer_info()
+    blur.blur(ffi.cast('uint8_t*', address))
+    for i, byte in enumerate(data[:8 * 5]):
+        assert 0 < byte < 0xFF, (i, byte)
+    # XXX How reliable is this?
+    assert data == array.array('B', [
+        1, 6, 13, 19, 19, 13, 6, 1,
+        5, 20, 41, 57, 57, 41, 20, 5,
+        6, 27, 55, 77, 77, 55, 27, 6,
+        5, 20, 41, 57, 57, 41, 20, 5,
+        1, 6, 13, 19, 19, 13, 6, 1,
+        0, 0, 0
+    ])
