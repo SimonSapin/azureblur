@@ -157,7 +157,7 @@ def calculate_blur_radius(standard_deviation_x, standard_deviation_y):
     """
     Calculates a blur radius that, when used with box blur,
     approximates a Gaussian blur with the given standard deviation.
-    The result of this function should be used as the :obj`blur_radius`
+    The result of this function should be used as the :obj:`blur_radius`
     parameter to :meth:`AlphaBoxBlur.from_radiuses`.
 
     """
