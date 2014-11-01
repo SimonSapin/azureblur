@@ -21,6 +21,7 @@ azureblur = ffi.verify(
         os.path.join(_moz2d, 'DataSurfaceHelpers.cpp'),
     ],
     include_dirs=[_moz2d],
+    libraries=['stdc++'],
     extra_compile_args=['-std=gnu++0x'])
 
 
