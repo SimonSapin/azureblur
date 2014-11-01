@@ -10,4 +10,4 @@ with Python bindings.
 * Source and issues: https://github.com/SimonSapin/azureblur
 * Install with ``pip install azureblur``.
   This requires ``libffi-dev``, ``python-dev``, and a C/C++ compiler.
-  See `CFF documentation <http://cffi.readthedocs.org/en/release-0.8/>`_.
+  See `CFFI documentation <http://cffi.readthedocs.org/en/release-0.8/>`_.
