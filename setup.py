@@ -6,5 +6,6 @@ setup(
     url='https://github.com/SimonSapin/azureblur',
     license='MPL2',
     install_requires=['cffi'],
-    py_modules=['azureblur'],
+    packages=['azureblur'],
+    package_data={'azureblur': ['src/*', 'moz2d/*.*', 'moz2d/*/*']},
 )
