@@ -174,6 +174,8 @@ def calculate_blur_radius(standard_deviation_x, standard_deviation_y):
     The result of this function should be used as the :obj:`blur_radius`
     parameter to :meth:`AlphaBoxBlur.from_radiuses`.
 
+    :returns: A blur radius as a ``(width, height)`` tuple.
+
     """
     size = azureblur.azureblur_calculate_blur_radius(
         standard_deviation_x, standard_deviation_y)

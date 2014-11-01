@@ -6,4 +6,3 @@ Documentation
 .. toctree::
 
 .. automodule:: azureblur
-    :members:
