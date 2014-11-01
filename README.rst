@@ -17,4 +17,4 @@ The image below is `generated
 with `cairocffi <https://pythonhosted.org/cairocffi/>`_
 and this library for blurring the shadow.
 
-.. image:: ../sample.png
+.. image:: sample.png
