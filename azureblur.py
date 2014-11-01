@@ -163,4 +163,10 @@ def calculate_blur_radius(standard_deviation_x, standard_deviation_y):
     """
     size = azureblur.azureblur_calculate_blur_radius(
         standard_deviation_x, standard_deviation_y)
-    return size.width, result.size
+    return size.width, size.height
+
+
+def test():
+    width, height = calculate_blur_radius(1000, 2000)
+    assert width == 2820
+    assert height == 5640
