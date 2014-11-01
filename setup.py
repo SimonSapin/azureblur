@@ -1,3 +1,4 @@
+# coding: utf8
 import os
 import io
 from setuptools import setup
