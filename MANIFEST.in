@@ -1,3 +1,4 @@
+include README.rst
 include LICENSE
 recursive-include azureblur/src *
 recursive-include azureblur/moz2d *
