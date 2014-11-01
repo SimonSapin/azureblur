@@ -141,16 +141,14 @@ class AlphaBoxBlur(object):
         """
         return azureblur.azureblur_get_surface_allocation_size(self._pointer)
 
-    def blur(self, data):
+    def blur_array(self, data_array):
         r"""
         Perform the blur in-place
         on the surface backed by specified 8-bit alpha surface data.
-        The size must be at least
-        that returned by :meth:`get_surface_allocation_size`
-        or bad things will happen.
 
-        :param data:
-            A ``uint8_t*`` pointer as a CFFI :class:`CData` object.
+        :param data_array:
+            A :class:`array.array` of at least
+            :meth:`get_surface_allocation_size` byte-sized items.
 
         Usage example:
 
@@ -160,11 +158,29 @@ class AlphaBoxBlur(object):
             blur = azureblur.AlphaBoxBlur.from_radiuses(...)
             alloc_size = blur.get_surface_allocation_size()
             data = array.array('B', b'\x00' * alloc_size)
-            address, _ = data.buffer_info()
-            blur.blur(azureblur.ffi.cast('uint8_t*', address))
+            blur.blur_array(data)
 
         """
-        azureblur.azureblur_blur(self._pointer, data)
+        assert data_array.itemsize == 1, 'Array must contain bytes.'
+        assert len(data_array) >= self.get_surface_allocation_size(), (
+            'Array must be at least `blur.get_surface_allocation_size()` '
+            'bytes long')
+        address, _ = data_array.buffer_info()
+        self.blur_pointer(ffi.cast('uint8_t*', address))
+
+    def blur_pointer(self, data_pointer):
+        """
+        Perform the blur in-place
+        on the surface backed by specified 8-bit alpha surface data.
+        The size must be at least
+        that returned by :meth:`get_surface_allocation_size`
+        or bad things will happen.
+
+        :param data_pointer:
+            A ``uint8_t*`` pointer as a CFFI :class:`CData` object.
+
+        """
+        azureblur.azureblur_blur(self._pointer, data_pointer)
 
 
 def calculate_blur_radius(standard_deviation_x, standard_deviation_y):
@@ -230,8 +246,7 @@ def test_blur():
     data[8 * 2 + 3] = 0xFF
     data[8 * 2 + 4] = 0xFF
     data[8 * 2 + 5] = 0xFF
-    address, _ = data.buffer_info()
-    blur.blur(ffi.cast('uint8_t*', address))
+    blur.blur_array(data)
     for i, byte in enumerate(data[:8 * 5]):
         assert 0 < byte < 0xFF, (i, byte)
     # XXX How reliable is this?
