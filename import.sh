@@ -49,6 +49,6 @@ for filename in $(echo "
     Logging.h
 ")
 do
-    mkdir -p $(dirname moz2d/$filename)
-    cp $1/$filename moz2d/$filename
+    mkdir -p $(dirname azureblur/moz2d/$filename)
+    cp $1/$filename azureblur/moz2d/$filename
 done
