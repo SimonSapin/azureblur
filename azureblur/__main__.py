@@ -37,7 +37,10 @@ def sample(filename):
 
     blur = AlphaBoxBlur.from_radiuses(
         blurred_text_rect, shadow_spread_radius, shadow_blur_radius)
+
+    # blurred_text_rect inflated to leave space for spread and blur.
     mask_x, mask_y, mask_width, mask_height = blur.get_rect()
+
     mask_data = array.array('B', b'\x00' * blur.get_surface_allocation_size())
 
     mask_surface = cairocffi.ImageSurface(
