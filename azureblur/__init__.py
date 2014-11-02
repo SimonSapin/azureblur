@@ -20,7 +20,10 @@ azureblur = ffi.verify(
         os.path.join(_src, 'azureblur.cpp'),
         os.path.join(_moz2d, 'Blur.cpp'),
         os.path.join(_moz2d, 'DataSurfaceHelpers.cpp'),
+        os.path.join(_moz2d, 'BlurSSE2.cpp'),
+        os.path.join(_moz2d, 'Factory.cpp'),
     ],
+    define_macros=[('USE_SSE2', '1')],
     include_dirs=[_moz2d],
     libraries=['stdc++'],
     extra_compile_args=['-std=gnu++0x'])
@@ -267,3 +270,18 @@ def test_blur():
         1, 6, 13, 19, 19, 13, 6, 1,
         0, 0, 0
     ])
+
+
+def benchmark():
+    blur = AlphaBoxBlur.from_radiuses(
+        rect=(0, 0, 3000, 1000),
+        spread_radius=(0, 0),
+        blur_radius=(5, 5),
+    )
+    data = array.array('B', b'\x00' * blur.get_surface_allocation_size())
+    for y in range(5, 10):
+        for x in (30, 50):
+            data[100 * y + x] = 0xFF
+
+    import timeit
+    print(min(timeit.repeat(lambda: blur.blur_array(data), number=10)))

@@ -47,8 +47,22 @@ for filename in $(echo "
     mozilla/DebugOnly.h
     DataSurfaceHelpers.cpp
     Logging.h
+    BlurSSE2.cpp
+    SSEHelpers.h
+    Factory.cpp
+    DrawTargetDual.h
+    SourceSurfaceDual.h
+    Filters.h
+    DrawTargetTiled.h
+    DrawTargetRecording.h
+    DrawEventRecorder.h
+    RecordedEvent.h
+    RecordingTypes.h
+    PathRecording.h
+    SourceSurfaceRawData.h
 ")
 do
     mkdir -p $(dirname azureblur/moz2d/$filename)
     cp $1/$filename azureblur/moz2d/$filename
 done
+sed -i '/TemporaryRef</,/^}$/d' azureblur/moz2d/Factory.cpp
