@@ -153,6 +153,10 @@ class AlphaBoxBlur(object):
             :exc:`ValueError` if the the array is too small
             or its items are not byte-sized.
 
+        On PyPy, because of the moving garbage collector,
+        :meth:`array.array.buffer_info` is the only reliable way to get
+        a pointer to a chuck of writable memory allocated from Python.
+
         Usage example:
 
         .. code-block:: python
