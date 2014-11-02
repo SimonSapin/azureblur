@@ -12,9 +12,14 @@ with Python bindings.
   This requires ``libffi-dev``, ``python-dev``, and a C/C++ compiler.
   See `CFFI documentation <http://cffi.readthedocs.org/en/release-0.8/>`_.
 
-The image below is `generated
-<https://github.com/SimonSapin/azureblur/blob/master/azureblur/__main__.py>`_
-with `cairocffi <https://pythonhosted.org/cairocffi/>`_
-and this library for blurring the shadow.
+This library only supports 2D raster images
+with a single channel of one byte per pixel.
+Such images are typically used as a *mask*
+that affects the alpha (transparency) channel of some other source.
+
+See for example `the code that generates the image below
+<https://github.com/SimonSapin/azureblur/blob/master/azureblur/__main__.py>`_,
+using this library for blurring the shadow
+and the `cairocffi <https://pythonhosted.org/cairocffi/>`_ 2D graphics library.
 
 .. image:: sample.png
