@@ -149,6 +149,9 @@ class AlphaBoxBlur(object):
         :param data_array:
             A :class:`array.array` of at least
             :meth:`get_surface_allocation_size` byte-sized items.
+        :raises:
+            :exc:`ValueError` if the the array is too small
+            or its items are not byte-sized.
 
         Usage example:
 
@@ -161,10 +164,12 @@ class AlphaBoxBlur(object):
             blur.blur_array(data)
 
         """
-        assert data_array.itemsize == 1, 'Array must contain bytes.'
-        assert len(data_array) >= self.get_surface_allocation_size(), (
-            'Array must be at least `blur.get_surface_allocation_size()` '
-            'bytes long')
+        if data_array.itemsize != 1:
+            raise ValueError('Array must contain bytes.')
+        if len(data_array) < self.get_surface_allocation_size():
+            raise ValueError(
+                'Array must be at least `blur.get_surface_allocation_size()` '
+                'bytes long')
         address, _ = data_array.buffer_info()
         self.blur_pointer(ffi.cast('uint8_t*', address))
 
